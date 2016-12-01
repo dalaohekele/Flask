@@ -5,7 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')or'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    MAIL_PORT = 587
+    MAIL_PORT = 465
     MAIL_USE_TLS = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')

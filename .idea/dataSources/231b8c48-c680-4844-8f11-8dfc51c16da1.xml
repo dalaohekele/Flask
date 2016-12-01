@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dataSource name="data">
+<dataSource name="data-dev [2]">
   <database-model serializer="dbm" rdbms="SQLITE" format-version="2.6">
     <schema id="1">
       <visible>1</visible>
@@ -43,19 +43,27 @@ unique (name</columns>
       <data-type>VARCHAR(64)(0,-1)|12</data-type>
     </column>
     <column id="14" parent="4" name="password_hash">
-      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+      <data-type>VARCHAR(128)(0,-1)|12</data-type>
     </column>
-    <index id="15" parent="4" name="ix_users_username">
+    <column id="15" parent="4" name="confirmed">
+      <data-type>BOOLEAN(0,-1)|4</data-type>
+    </column>
+    <index id="16" parent="4" name="ix_users_username">
       <columns>username</columns>
       <desc-columns></desc-columns>
       <unique>1</unique>
     </index>
-    <key id="16" parent="4">
+    <index id="17" parent="4" name="ix_users_email">
+      <columns>email</columns>
+      <desc-columns></desc-columns>
+      <unique>1</unique>
+    </index>
+    <key id="18" parent="4">
       <columns>id)
 foreign key(role_id</columns>
       <primary>1</primary>
     </key>
-    <foreign-key id="17" parent="4" name="#FAKE_users_1">
+    <foreign-key id="19" parent="4" name="#FAKE_users_1">
       <name-surrogate>1</name-surrogate>
       <columns>role_id</columns>
       <deferrable>1</deferrable>
