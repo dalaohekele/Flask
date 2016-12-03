@@ -18,7 +18,7 @@ from jinja2.utils import Markup, escape, pformat, urlize, soft_unicode, \
      unicode_urlencode
 from jinja2.runtime import Undefined
 from jinja2.exceptions import FilterArgumentError
-from jinja2._compat import imap, string_types, text_type, iteritems
+from jinja2._compat import next, imap, string_types, text_type, iteritems
 
 
 _word_re = re.compile(r'\w+(?u)')
@@ -94,8 +94,7 @@ def do_urlencode(value):
     if itemiter is None:
         return unicode_urlencode(value)
     return u'&'.join(unicode_urlencode(k) + '=' +
-                     unicode_urlencode(v, for_qs=True)
-                     for k, v in itemiter)
+                     unicode_urlencode(v) for k, v in itemiter)
 
 
 @evalcontextfilter
@@ -184,7 +183,7 @@ def do_title(s):
     uppercase letters, all remaining characters are lowercase.
     """
     rv = []
-    for item in re.compile(r'([-\s]+)(?u)').split(soft_unicode(s)):
+    for item in re.compile(r'([-\s]+)(?u)').split(s):
         if not item:
             continue
         rv.append(item[0].upper() + item[1:].lower())
@@ -205,7 +204,8 @@ def do_dictsort(value, case_sensitive=False, by='key'):
             sort the dict by key, case sensitive
 
         {% for item in mydict|dictsort(false, 'value') %}
-            sort the dict by value, case insensitive
+            sort the dict by key, case insensitive, sorted
+            normally and ordered by value.
     """
     if by == 'key':
         pos = 0
@@ -409,8 +409,7 @@ def do_pprint(value, verbose=False):
 
 
 @evalcontextfilter
-def do_urlize(eval_ctx, value, trim_url_limit=None, nofollow=False,
-              target=None):
+def do_urlize(eval_ctx, value, trim_url_limit=None, nofollow=False):
     """Converts URLs in plain text into clickable links.
 
     If you pass the filter an additional integer it will shorten the urls
@@ -421,18 +420,8 @@ def do_urlize(eval_ctx, value, trim_url_limit=None, nofollow=False,
 
         {{ mytext|urlize(40, true) }}
             links are shortened to 40 chars and defined with rel="nofollow"
-
-    If *target* is specified, the ``target`` attribute will be added to the
-    ``<a>`` tag:
-
-    .. sourcecode:: jinja
-
-       {{ mytext|urlize(40, target='_blank') }}
-
-    .. versionchanged:: 2.8+
-       The *target* parameter was added.
     """
-    rv = urlize(value, trim_url_limit, nofollow, target)
+    rv = urlize(value, trim_url_limit, nofollow)
     if eval_ctx.autoescape:
         rv = Markup(rv)
     return rv
@@ -467,22 +456,25 @@ def do_truncate(s, length=255, killwords=False, end='...'):
 
     .. sourcecode:: jinja
 
-        {{ "foo bar baz"|truncate(9) }}
+        {{ "foo bar"|truncate(5) }}
             -> "foo ..."
-        {{ "foo bar baz"|truncate(9, True) }}
-            -> "foo ba..."
-
+        {{ "foo bar"|truncate(5, True) }}
+            -> "foo b..."
     """
     if len(s) <= length:
         return s
     elif killwords:
-        return s[:length - len(end)] + end
-
-    result = s[:length - len(end)].rsplit(' ', 1)[0]
-    if len(result) < length:
-        result += ' '
-    return result + end
-
+        return s[:length] + end
+    words = s.split(' ')
+    result = []
+    m = 0
+    for word in words:
+        m += len(word) + 1
+        if m > length:
+            break
+        result.append(word)
+    result.append(end)
+    return u' '.join(result)
 
 @environmentfilter
 def do_wordwrap(environment, s, width=79, break_long_words=True,
@@ -511,16 +503,13 @@ def do_wordcount(s):
     return len(_word_re.findall(s))
 
 
-def do_int(value, default=0, base=10):
+def do_int(value, default=0):
     """Convert the value into an integer. If the
     conversion doesn't work it will return ``0``. You can
-    override this default using the first parameter. You
-    can also override the default base (10) in the second
-    parameter, which handles input with prefixes such as
-    0b, 0o and 0x for bases 2, 8 and 16 respectively.
+    override this default using the first parameter.
     """
     try:
-        return int(value, base)
+        return int(value)
     except (TypeError, ValueError):
         # this quirk is necessary so that "42.23"|int gives 42.
         try:
@@ -623,6 +612,7 @@ def do_batch(value, linecount, fill_with=None):
         {%- endfor %}
         </table>
     """
+    result = []
     tmp = []
     for item in value:
         if len(tmp) == linecount:
@@ -763,7 +753,7 @@ def do_mark_unsafe(value):
 
 
 def do_reverse(value):
-    """Reverse the object or return an iterator that iterates over it the other
+    """Reverse the object or return an iterator the iterates over it the other
     way round.
     """
     if isinstance(value, string_types):
@@ -782,7 +772,7 @@ def do_reverse(value):
 @environmentfilter
 def do_attr(environment, obj, name):
     """Get an attribute of an object.  ``foo|attr("bar")`` works like
-    ``foo.bar`` just that always an attribute is returned and items are not
+    ``foo["bar"]`` just that always an attribute is returned and items are not
     looked up.
 
     See :ref:`Notes on subscriptions <notes-on-subscriptions>` for more details.
@@ -852,14 +842,13 @@ def do_map(*args, **kwargs):
 
 @contextfilter
 def do_select(*args, **kwargs):
-    """Filters a sequence of objects by applying a test to the object and only
-    selecting the ones with the test succeeding.
+    """Filters a sequence of objects by appying a test to either the object
+    or the attribute and only selecting the ones with the test succeeding.
 
     Example usage:
 
     .. sourcecode:: jinja
 
-        {{ numbers|select("odd") }}
         {{ numbers|select("odd") }}
 
     .. versionadded:: 2.7
@@ -869,8 +858,8 @@ def do_select(*args, **kwargs):
 
 @contextfilter
 def do_reject(*args, **kwargs):
-    """Filters a sequence of objects by applying a test to the object and
-    rejecting the ones with the test succeeding.
+    """Filters a sequence of objects by appying a test to either the object
+    or the attribute and rejecting the ones with the test succeeding.
 
     Example usage:
 
@@ -885,8 +874,8 @@ def do_reject(*args, **kwargs):
 
 @contextfilter
 def do_selectattr(*args, **kwargs):
-    """Filters a sequence of objects by applying a test to an attribute of an
-    object and only selecting the ones with the test succeeding.
+    """Filters a sequence of objects by appying a test to either the object
+    or the attribute and only selecting the ones with the test succeeding.
 
     Example usage:
 
@@ -902,8 +891,8 @@ def do_selectattr(*args, **kwargs):
 
 @contextfilter
 def do_rejectattr(*args, **kwargs):
-    """Filters a sequence of objects by applying a test to an attribute of an
-    object or the attribute and rejecting the ones with the test succeeding.
+    """Filters a sequence of objects by appying a test to either the object
+    or the attribute and rejecting the ones with the test succeeding.
 
     .. sourcecode:: jinja
 
@@ -944,53 +933,55 @@ def _select_or_reject(args, kwargs, modfunc, lookup_attr):
 
 
 FILTERS = {
-    'abs':                  abs,
     'attr':                 do_attr,
-    'batch':                do_batch,
-    'capitalize':           do_capitalize,
-    'center':               do_center,
-    'count':                len,
-    'd':                    do_default,
-    'default':              do_default,
-    'dictsort':             do_dictsort,
-    'e':                    escape,
-    'escape':               escape,
-    'filesizeformat':       do_filesizeformat,
-    'first':                do_first,
-    'float':                do_float,
-    'forceescape':          do_forceescape,
-    'format':               do_format,
-    'groupby':              do_groupby,
-    'indent':               do_indent,
-    'int':                  do_int,
-    'join':                 do_join,
-    'last':                 do_last,
-    'length':               len,
-    'list':                 do_list,
+    'replace':              do_replace,
+    'upper':                do_upper,
     'lower':                do_lower,
+    'escape':               escape,
+    'e':                    escape,
+    'forceescape':          do_forceescape,
+    'capitalize':           do_capitalize,
+    'title':                do_title,
+    'default':              do_default,
+    'd':                    do_default,
+    'join':                 do_join,
+    'count':                len,
+    'dictsort':             do_dictsort,
+    'sort':                 do_sort,
+    'length':               len,
+    'reverse':              do_reverse,
+    'center':               do_center,
+    'indent':               do_indent,
+    'title':                do_title,
+    'capitalize':           do_capitalize,
+    'first':                do_first,
+    'last':                 do_last,
     'map':                  do_map,
-    'pprint':               do_pprint,
     'random':               do_random,
     'reject':               do_reject,
     'rejectattr':           do_rejectattr,
-    'replace':              do_replace,
-    'reverse':              do_reverse,
-    'round':                do_round,
-    'safe':                 do_mark_safe,
+    'filesizeformat':       do_filesizeformat,
+    'pprint':               do_pprint,
+    'truncate':             do_truncate,
+    'wordwrap':             do_wordwrap,
+    'wordcount':            do_wordcount,
+    'int':                  do_int,
+    'float':                do_float,
+    'string':               soft_unicode,
+    'list':                 do_list,
+    'urlize':               do_urlize,
+    'format':               do_format,
+    'trim':                 do_trim,
+    'striptags':            do_striptags,
     'select':               do_select,
     'selectattr':           do_selectattr,
     'slice':                do_slice,
-    'sort':                 do_sort,
-    'string':               soft_unicode,
-    'striptags':            do_striptags,
+    'batch':                do_batch,
     'sum':                  do_sum,
-    'title':                do_title,
-    'trim':                 do_trim,
-    'truncate':             do_truncate,
-    'upper':                do_upper,
-    'urlencode':            do_urlencode,
-    'urlize':               do_urlize,
-    'wordcount':            do_wordcount,
-    'wordwrap':             do_wordwrap,
+    'abs':                  abs,
+    'round':                do_round,
+    'groupby':              do_groupby,
+    'safe':                 do_mark_safe,
     'xmlattr':              do_xmlattr,
+    'urlencode':            do_urlencode
 }

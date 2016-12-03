@@ -103,6 +103,7 @@ def change_password():
         else:
             flash('密码错误')
 
+
     return render_template("auth/change_password.html",form=form)
 
 @auth.route('/reset', methods=['GET', 'POST'])
@@ -140,10 +141,10 @@ def password_reset(token):
     return render_template('auth/reset_password.html', form=form)
 
 
-@auth.route('/change-email',method=['GET','POST'])
+@auth.route('/change-email',methods=['GET','POST'])
 @login_required
 def change_email_request():
-    form = ChangePasswordForm()
+    form = ChangeEmailForm()
     if form.validate_on_submit():
         if current_user.verify_password(form.password.data):
             new_email = form.email.data

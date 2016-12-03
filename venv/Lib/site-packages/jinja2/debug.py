@@ -12,10 +12,10 @@
 """
 import sys
 import traceback
-from types import TracebackType, CodeType
+from types import TracebackType
 from jinja2.utils import missing, internal_code
 from jinja2.exceptions import TemplateSyntaxError
-from jinja2._compat import iteritems, reraise, PY2
+from jinja2._compat import iteritems, reraise, code_type
 
 # on pypy we can take advantage of transparent proxies
 try:
@@ -245,21 +245,12 @@ def fake_exc_info(exc_info, filename, lineno):
                 location = 'block "%s"' % function[6:]
             else:
                 location = 'template'
-
-        if PY2:
-            code = CodeType(0, code.co_nlocals, code.co_stacksize,
-                            code.co_flags, code.co_code, code.co_consts,
-                            code.co_names, code.co_varnames, filename,
-                            location, code.co_firstlineno,
-                            code.co_lnotab, (), ())
-        else:
-            code = CodeType(0, code.co_kwonlyargcount,
-                            code.co_nlocals, code.co_stacksize,
-                            code.co_flags, code.co_code, code.co_consts,
-                            code.co_names, code.co_varnames, filename,
-                            location, code.co_firstlineno,
-                            code.co_lnotab, (), ())
-    except Exception as e:
+        code = code_type(0, code.co_nlocals, code.co_stacksize,
+                         code.co_flags, code.co_code, code.co_consts,
+                         code.co_names, code.co_varnames, filename,
+                         location, code.co_firstlineno,
+                         code.co_lnotab, (), ())
+    except:
         pass
 
     # execute the code and catch the new traceback
@@ -282,15 +273,11 @@ def _init_ugly_crap():
     import ctypes
     from types import TracebackType
 
-    if PY2:
-        # figure out size of _Py_ssize_t for Python 2:
-        if hasattr(ctypes.pythonapi, 'Py_InitModule4_64'):
-            _Py_ssize_t = ctypes.c_int64
-        else:
-            _Py_ssize_t = ctypes.c_int
+    # figure out side of _Py_ssize_t
+    if hasattr(ctypes.pythonapi, 'Py_InitModule4_64'):
+        _Py_ssize_t = ctypes.c_int64
     else:
-        # platform ssize_t on Python 3
-        _Py_ssize_t = ctypes.c_ssize_t
+        _Py_ssize_t = ctypes.c_int
 
     # regular python
     class _PyObject(ctypes.Structure):
