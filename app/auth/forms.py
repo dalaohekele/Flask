@@ -58,7 +58,7 @@ class PasswordResetForm(Form):
 class ChangeEmailForm(Form):
     email = StringField('新邮箱',validators=[DataRequired(),Length(1,64),Email()])
     password = PasswordField('密码',validators=[DataRequired()])
-    submit = SubmitField('邮箱地址已更改')
+    submit = SubmitField('修改邮箱')
 
     def validate_email(self,field):
         if User.query.filter_by(email=field.data).first():

@@ -4,7 +4,8 @@ from flask.ext.login import login_user,logout_user,login_required
 from . import auth
 from .. import db
 from ..models import User
-from .forms import LoginForm,RegistrationForm,ChangePasswordForm,PasswordResetForm,PasswordResetRequestForm
+from .forms import LoginForm,RegistrationForm,ChangePasswordForm,PasswordResetForm,\
+    PasswordResetRequestForm,ChangeEmailForm
 from ..email import send_email
 from flask.ext.login import current_user
 
@@ -149,16 +150,18 @@ def change_email_request():
         if current_user.verify_password(form.password.data):
             new_email = form.email.data
             token = current_user.generate_email_change_token(new_email)
-            send_email(new_email,'确认你的邮箱地址','auth/email/change_email',user=current_user,token=token)
+            send_email(new_email, '确认你的邮箱地址',
+                       'auth/email/change_email',
+                       user=current_user, token=token)
             flash('邮件已发送至您的邮箱')
             return redirect(url_for('main.index'))
         else:
             flash('无效的邮箱或密码')
-    return render_template("auth/change_email.html",form=form)
+    return render_template("auth/change_email.html", form=form)
 
 @auth.route('/change-email/<token>')
 @login_required
-def changer_email(token):
+def change_email(token):
     if current_user.change_email(token):
         flash('你的邮箱地址已更新')
     else:
