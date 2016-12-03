@@ -1,3 +1,4 @@
+# coding=utf-8
 from flask import Flask, render_template
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.mail import Mail
@@ -28,6 +29,7 @@ def create_app(config_name):
     db.init_app(app)
     login_manager.init_app(app)
 
+    # 注册子程序中的蓝本
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 

@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="dataSourceStorage">
+<<<<<<< HEAD
   <data-source name="data-dev" uuid="857d457d-b150-453f-9ca4-6e7c00a75d61">
+=======
+  <data-source name="data" uuid="d6f2fbaf-70e6-4da1-a355-0a3b0ccd0038">
+    <database-info product="" version="" jdbc-version="" driver-name="" driver-version=""/>
+  </data-source>
+  <data-source name="data-dev" uuid="d7fcd252-d96f-42b3-94cd-7569a9a8f577">
+>>>>>>> 4d062ebcbc318ee56265e7270aaa0c59c1215b59
     <database-info product="" version="" jdbc-version="" driver-name="" driver-version=""/>
   </data-source>
 </component>
