@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dataSource name="data-dev [2]">
+<dataSource name="data-dev">
   <database-model serializer="dbm" rdbms="SQLITE" format-version="2.6">
     <schema id="1">
       <visible>1</visible>
@@ -33,14 +33,14 @@ unique (name</columns>
       <mandatory>1</mandatory>
       <data-type>INTEGER(0,-1)|4</data-type>
     </column>
-    <column id="11" parent="4" name="username">
+    <column id="11" parent="4" name="email">
       <data-type>VARCHAR(64)(0,-1)|12</data-type>
     </column>
-    <column id="12" parent="4" name="role_id">
+    <column id="12" parent="4" name="username">
+      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+    </column>
+    <column id="13" parent="4" name="role_id">
       <data-type>INTEGER(0,-1)|4</data-type>
-    </column>
-    <column id="13" parent="4" name="email">
-      <data-type>VARCHAR(64)(0,-1)|12</data-type>
     </column>
     <column id="14" parent="4" name="password_hash">
       <data-type>VARCHAR(128)(0,-1)|12</data-type>
@@ -48,13 +48,13 @@ unique (name</columns>
     <column id="15" parent="4" name="confirmed">
       <data-type>BOOLEAN(0,-1)|4</data-type>
     </column>
-    <index id="16" parent="4" name="ix_users_username">
-      <columns>username</columns>
+    <index id="16" parent="4" name="ix_users_email">
+      <columns>email</columns>
       <desc-columns></desc-columns>
       <unique>1</unique>
     </index>
-    <index id="17" parent="4" name="ix_users_email">
-      <columns>email</columns>
+    <index id="17" parent="4" name="ix_users_username">
+      <columns>username</columns>
       <desc-columns></desc-columns>
       <unique>1</unique>
     </index>

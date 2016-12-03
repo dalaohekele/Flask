@@ -43,7 +43,7 @@ unique (name</columns>
       <data-type>VARCHAR(64)(0,-1)|12</data-type>
     </column>
     <column id="14" parent="4" name="password_hash">
-      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+      <data-type>VARCHAR(128)(0,-1)|12</data-type>
     </column>
     <index id="15" parent="4" name="ix_users_username">
       <columns>username</columns>
