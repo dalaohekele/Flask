@@ -10,7 +10,7 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
+    FLASKY_MAIL_SUBJECT_PREFIX = '[大乐]'
     # 在本地环境设置支持smtp的邮箱服务
     #Mac OS X 中使用 bash，那么可以按照下面的方式设定这两个变量：
     # (venv) $ export MAIL_USERNAME=<Gmail username>

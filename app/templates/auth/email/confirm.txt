@@ -1,13 +1,8 @@
-Dear {{ user.username }},
+亲爱的 {{ user.username }},
 
-Welcome to Flasky!
 
-To confirm your account please click on the following link:
+因为网站没有备案，所以不能发送链接，所以这只是测试邮件，点了也没用
+应该在你邮件的垃圾箱里.............
 
-{{ url_for('auth.confirm', token=token, _external=True) }}
+来自：进击的大乐
 
-Sincerely,
-
-The Flasky Team
-
-Note: replies to this email address are not monitored.
