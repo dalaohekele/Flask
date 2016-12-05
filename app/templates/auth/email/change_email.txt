@@ -1,11 +1,7 @@
-Dear {{ user.username }},
+亲爱的 {{ user.username }},
 
-To confirm your new email address click on the following link:
 
-{{ url_for('auth.change_email', token=token, _external=True) }}
+因为网站没有备案，所以不能发送链接，所以这只是测试邮件，点了也没用
+应该在你邮件的垃圾箱里.............
 
-Sincerely,
-
-The Flasky Team
-
-Note: replies to this email address are not monitored.
+来自：进击的大乐
