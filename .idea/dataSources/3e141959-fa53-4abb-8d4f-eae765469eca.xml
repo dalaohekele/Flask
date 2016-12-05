@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="data-dev">
+  <database-model serializer="dbm" rdbms="SQLITE" format-version="2.6">
+    <schema id="1">
+      <visible>1</visible>
+    </schema>
+    <table id="2" parent="1" name="alembic_version"/>
+    <table id="3" parent="1" name="roles"/>
+    <table id="4" parent="1" name="users"/>
+    <column id="5" parent="2" name="version_num">
+      <mandatory>1</mandatory>
+      <data-type>VARCHAR(32)(0,-1)|12</data-type>
+    </column>
+    <column id="6" parent="3" name="id">
+      <mandatory>1</mandatory>
+      <data-type>INTEGER(0,-1)|4</data-type>
+    </column>
+    <column id="7" parent="3" name="name">
+      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+    </column>
+    <column id="8" parent="3" name="default">
+      <data-type>BOOLEAN(0,-1)|4</data-type>
+    </column>
+    <column id="9" parent="3" name="permissions">
+      <data-type>INTEGER(0,-1)|4</data-type>
+    </column>
+    <index id="10" parent="3" name="sqlite_autoindex_roles_1">
+      <name-surrogate>1</name-surrogate>
+      <columns>name</columns>
+      <desc-columns></desc-columns>
+      <unique>1</unique>
+    </index>
+    <index id="11" parent="3" name="ix_roles_default">
+      <columns>default</columns>
+      <desc-columns></desc-columns>
+      <unique>1</unique>
+    </index>
+    <key id="12" parent="3">
+      <columns>id)
+unique (name</columns>
+      <primary>1</primary>
+    </key>
+    <column id="13" parent="4" name="id">
+      <mandatory>1</mandatory>
+      <data-type>INTEGER(0,-1)|4</data-type>
+    </column>
+    <column id="14" parent="4" name="email">
+      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+    </column>
+    <column id="15" parent="4" name="username">
+      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+    </column>
+    <column id="16" parent="4" name="role_id">
+      <data-type>INTEGER(0,-1)|4</data-type>
+    </column>
+    <column id="17" parent="4" name="password_hash">
+      <data-type>VARCHAR(128)(0,-1)|12</data-type>
+    </column>
+    <column id="18" parent="4" name="confirmed">
+      <data-type>BOOLEAN(0,-1)|4</data-type>
+    </column>
+    <index id="19" parent="4" name="ix_users_email">
+      <columns>email</columns>
+      <desc-columns></desc-columns>
+      <unique>1</unique>
+    </index>
+    <index id="20" parent="4" name="ix_users_username">
+      <columns>username</columns>
+      <desc-columns></desc-columns>
+      <unique>1</unique>
+    </index>
+    <key id="21" parent="4">
+      <columns>id)
+foreign key(role_id</columns>
+      <primary>1</primary>
+    </key>
+    <foreign-key id="22" parent="4" name="#FAKE_users_1">
+      <name-surrogate>1</name-surrogate>
+      <columns>role_id</columns>
+      <deferrable>1</deferrable>
+      <initially-deferred>1</initially-deferred>
+      <ref-key>roles(id)</ref-key>
+      <cascade-update-rule>no_action</cascade-update-rule>
+      <cascade-delete-rule>no_action</cascade-delete-rule>
+    </foreign-key>
+  </database-model>
+</dataSource>
