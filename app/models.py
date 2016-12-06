@@ -24,6 +24,7 @@ class Role(db.Model):
     permissions = db.Column(db.Integer)
     users = db.relationship('User', backref='role', lazy='dynamic')
 
+    # 角色权限
     @staticmethod
     def insert_roles():
         roles = {
@@ -62,8 +63,8 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(64))
     location = db.Column(db.String(64))
     about_me = db.Column(db.Text())
-    member_since = db.Column(db.DateTime(),default=datetime.utcnow)
-    last_seen = db.Column(db.DateTime(),default=datetime.utcnow)
+    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 
 
     # 定义默认的用户角色

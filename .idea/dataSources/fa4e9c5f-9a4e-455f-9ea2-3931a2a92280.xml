@@ -59,22 +59,37 @@ unique (name</columns>
     <column id="18" parent="4" name="confirmed">
       <data-type>BOOLEAN(0,-1)|4</data-type>
     </column>
-    <index id="19" parent="4" name="ix_users_email">
+    <column id="19" parent="4" name="name">
+      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+    </column>
+    <column id="20" parent="4" name="location">
+      <data-type>VARCHAR(64)(0,-1)|12</data-type>
+    </column>
+    <column id="21" parent="4" name="about_me">
+      <data-type>TEXT(0,-1)|12</data-type>
+    </column>
+    <column id="22" parent="4" name="member_since">
+      <data-type>DATETIME(0,-1)|12</data-type>
+    </column>
+    <column id="23" parent="4" name="last_seen">
+      <data-type>DATETIME(0,-1)|12</data-type>
+    </column>
+    <index id="24" parent="4" name="ix_users_email">
       <columns>email</columns>
       <desc-columns></desc-columns>
       <unique>1</unique>
     </index>
-    <index id="20" parent="4" name="ix_users_username">
+    <index id="25" parent="4" name="ix_users_username">
       <columns>username</columns>
       <desc-columns></desc-columns>
       <unique>1</unique>
     </index>
-    <key id="21" parent="4">
+    <key id="26" parent="4">
       <columns>id)
 foreign key(role_id</columns>
       <primary>1</primary>
     </key>
-    <foreign-key id="22" parent="4" name="#FAKE_users_1">
+    <foreign-key id="27" parent="4" name="#FAKE_users_1">
       <name-surrogate>1</name-surrogate>
       <columns>role_id</columns>
       <deferrable>1</deferrable>
