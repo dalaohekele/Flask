@@ -27,7 +27,7 @@ class EditProfileAdminForm(Form):
     username = StringField('用户名',validators=[DataRequired(),Length(1,64),Regexp('^[A-Za-z0-9_.]*$',0,
                                                                                 '用户名必须由字母、数字、下划线、点号组成')])
     confirmed = BooleanField('是否认证')
-    roel = SelectField('角色',coerce=int)
+    role = SelectField('角色',coerce=int)
     name = StringField('真实姓名',validators=[Length(0,64)])
     location = StringField('地址',validators=[Length(0,64)])
     about_me = TextAreaField('自我描述')
@@ -61,3 +61,6 @@ class EditProfileAdminForm(Form):
         if field.data != self.user.username and User.query.filter_by(username=field.data).first():
             raise ValidationError('用户名已存在')
 
+class PostForm(Form):
+    body = TextAreaField('内容',validators=[DataRequired()])
+    submit = SubmitField('提交')
