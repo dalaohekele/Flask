@@ -4,6 +4,7 @@ from wtforms import StringField,TextAreaField,SubmitField,BooleanField,SelectFie
 from wtforms.validators import DataRequired,Length,Email,Regexp
 from wtforms import ValidationError
 from ..models import Role, User
+from flask.ext.pagedown.fields import PageDownField
 
 # 添加中文支持
 import sys
@@ -52,7 +53,7 @@ class EditProfileAdminForm(Form):
     # 如果设定的函数是以validate_开头的，那么，他会在验证的时候，和上面表单的普通验证一起使用。
     # validate_email ,下划线后面的内容，对应上面表单的名字，再具体一些，对应的是form.email，也就是Form实例对象的email属性。
     # 所以field.data这句意思实际上是form.email.data != self.user.username 。
-    def validate(self,field):
+    def validate_email(self,field):
         if field.data != self.user.email and User.query.filter_by(email=field.data).first():
             raise ValidationError('邮箱已存在')
 
@@ -62,5 +63,5 @@ class EditProfileAdminForm(Form):
             raise ValidationError('用户名已存在')
 
 class PostForm(Form):
-    body = TextAreaField('内容',validators=[DataRequired()])
+    body = PageDownField('内容',validators=[DataRequired()])
     submit = SubmitField('提交')

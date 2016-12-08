@@ -5,6 +5,13 @@ from flask import current_app
 from flask_login import UserMixin,AnonymousUserMixin
 from . import db, login_manager
 from datetime import datetime
+from markdown import markdown
+import bleach
+
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # 权限常量
 class Permission:
@@ -53,6 +60,13 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+# 关注关联表
+class Follow(db.Model):
+    __tablename__ = "follows"
+    follower_id = db.Column(db.Integer,db.ForeignKey('users.id'),primary_key=True)
+    followed_id = db.Column(db.Integer,db.ForeignKey('users.id'),primary_key=True)
+    timestamp = db.Column(db.DateTime,default=datetime.utcnow)
+
 # 用户表
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -62,14 +76,23 @@ class User(UserMixin, db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
-
     name = db.Column(db.String(64))
     location = db.Column(db.String(64))
     about_me = db.Column(db.Text())
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
-
     posts = db.relationship('Post',backref='author',lazy='dynamic')
+
+    followed = db.relationship('Follow',
+                               foreign_keys = [Follow.follower_id],
+                               backref = db.backref('follower',lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all,delete-orphan')
+    followers = db.relationship('Follow',
+                                foreign_keys =[Follow.followed_id],
+                                backref = db.backref('followed',lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all,delete-orphan')
 
 
     # python的ForgeryPy 的随机信息生成器生成博文以便测试
@@ -186,6 +209,22 @@ class User(UserMixin, db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
+    def follow(self,user):
+        if not self.is_following(user):
+            f = Follow(followed=user)
+            self.followed.append(f)
+
+    def unfollow(self,user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            self.followed.remove(f)
+
+    def is_following(self,user):
+        return self.followed.filter_by(followed_id=user.id).first() is not None
+
+    def is_followed_by(self,user):
+        return self.followers.fillter_by(follower_id=user.id).first() is not None
+
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -209,6 +248,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
@@ -219,13 +259,24 @@ class Post(db.Model):
     def generate_fake(count=100):
         from random import seed, randint
         import forgery_py
-
         seed()
         user_count = User.query.count()
         for i in range(count):
+
             u = User.query.offset(randint(0, user_count - 1)).first()
             p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
                      timestamp=forgery_py.date.date(True),
                      author=u)
             db.session.add(p)
             db.session.commit()
+
+    @staticmethod
+    def on_changed_body(target,value,oldvalue,initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'p']
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value,output_format='html'),
+            tags=allowed_tags,strip=True))
+
+db.event.listen(Post.body, 'set', Post.on_changed_body)
