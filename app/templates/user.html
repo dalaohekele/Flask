@@ -20,7 +20,7 @@
         {% endif %}
         {% if user.about_me %}<p>个人资料：{{ user.about_me }}</p>{% endif %}
         <p>注册时间：{{ moment(user.member_since).format('L') }}<br>最近一次登录 {{ moment(user.last_seen).fromNow() }}.</p>
-        <p>发布博客总数：{{ user.posts.count() }} </p>
+        <p>发布博客总数：{{ user.posts.count() }} 评论总数：{{ user.comments.count() }}</p>
         <p>
             {% if current_user.can(Permission.FOLLOW) and user != current_user %}
                 {% if not current_user.is_following(user) %}
