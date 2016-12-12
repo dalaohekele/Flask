@@ -1,11 +1,12 @@
 # incoding=utf-8
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app,request, url_for
 from flask_login import UserMixin,AnonymousUserMixin
 from . import db, login_manager
 from datetime import datetime
 from markdown import markdown
+from app.exceptions import ValidationError
 import bleach
 
 
@@ -243,6 +244,37 @@ class User(UserMixin, db.Model):
             .filter(Follow.follower_id==self.id)
 
 
+    # 用户转换成JSON格式的序列化字典
+    def to_json(self):
+        json_user = {
+            'url': url_for('api.get_user', id=self.id, _external=True),
+            'username': self.username,
+            'member_since': self.member_since,
+            'last_seen': self.last_seen,
+            'posts': url_for('api.get_user_posts', id=self.id, _external=True),
+            'followed_posts': url_for('api.get_user_followed_posts',
+                                      id=self.id, _external=True),
+            'post_count': self.posts.count()
+        }
+        return json_user
+
+    # 基于令牌的认证
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config['SECRET_KEY'],
+                       expires_in=expiration)
+        return s.dumps({'id': self.id}).decode('ascii')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+
+
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -296,6 +328,30 @@ class Post(db.Model):
         target.body_html = bleach.linkify(bleach.clean(
             markdown(value,output_format='html'),
             tags=allowed_tags,strip=True))
+
+    def to_json(self):
+        json_post = {
+            'url': url_for('api.get_post', id=self.id, _external=True),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author': url_for('api.get_user', id=self.author_id,
+                              _external=True),
+            'comments': url_for('api.get_post_comments', id=self.id,
+                                _external=True),
+            'comment_count': self.comments.count()
+        }
+        return json_post
+
+
+    # 从json格式数据创建一篇博客文章
+    @staticmethod
+    def from_json(json_post):
+        body = json_post.get('body')
+        if body is None or body == '':
+            raise ValidationError('post does not have a body')
+        return Post(body=body)
+
 
 db.event.listen(Post.body, 'set', Post.on_changed_body)
 
