@@ -1,0 +1,2 @@
+SQLAlchemy>=0.7.3
+Mako
