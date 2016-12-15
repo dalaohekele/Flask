@@ -1,10 +1,14 @@
-{% extends "base.html" %}
-{% import "_macros.html" as macros %}
-{% block title %}Flasky - {{ user.username }}{% endblock %}
+{% extends "main/base.html" %}
+{% import "main/_macros.html" as macros %}
+{% block title %}BIGHappy {{ user.username }}{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
-    <img class="img-rounded profile-thumbnail" src="../static/12.jpg">
+    {% if user.real_avatar %}
+    <img class="img-rounded profile-thumbnail" src="{{ user.real_avatar }}">
+    {% else %}
+    <img class="img-rounded profile-thumbnail" src="/static/avatar/default.jpg">
+    {% endif %}
     <div class="profile-header">
         <h1>{{ user.username }}</h1>
         {% if user.name or user.location %}
@@ -46,7 +50,7 @@
     </div>
 </div>
 <h3>{{ user.username }}已发布的博客</h3>
-{% include '_posts.html' %}
+{% include 'blog/_posts.html' %}
 {% if pagination %}
 <div class="pagination">
     {{ macros.pagination_widget(pagination, '.user', username=user.username) }}

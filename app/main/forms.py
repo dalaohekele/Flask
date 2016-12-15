@@ -1,13 +1,14 @@
 # coding=utf-8
-from flask_wtf import Form
-from wtforms import StringField,TextAreaField,SubmitField,BooleanField,SelectField
-from wtforms.validators import DataRequired,Length,Email,Regexp
-from wtforms import ValidationError
-from ..models import Role, User
-from flask.ext.pagedown.fields import PageDownField
-
-# 添加中文支持
 import sys
+
+from flask.ext.pagedown.fields import PageDownField
+from flask_wtf import Form
+from wtforms import StringField,TextAreaField,SubmitField,BooleanField,SelectField,FileField
+from wtforms import ValidationError
+from wtforms.validators import DataRequired,Length,Email,Regexp
+
+from app.table.models import Role, User
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -20,6 +21,7 @@ class EditProfileForm(Form):
     name = StringField('真实姓名',validators=[Length(0,64)])
     location = StringField('地址',validators=[Length(0,64)])
     about_me = TextAreaField('自我描述')
+    avatar = FileField('头像')
     submit = SubmitField('提交')
 
 

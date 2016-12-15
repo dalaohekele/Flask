@@ -26,6 +26,8 @@ class Config:
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
 
+    UPLOAD_FOLDER = os.getcwd() + '/app/static/avatar/'
+
     @staticmethod
     def init_app(app):
         pass
@@ -41,7 +43,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/Flask-pro'
 
-
+# default默认设置为开发环境的数据库
+# 如需要切换数据库，则将default的值修改为ProductionConfig
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,

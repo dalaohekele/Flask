@@ -10,7 +10,7 @@ sys.setdefaultencoding('utf-8')
 
 @main.app_errorhandler(403)
 def forbidden(e):
-    return render_template('403.html'), 403
+    return render_template('error/403.html'), 403
 
 # 404和500状态响应码需要特殊处理,因为这两个错误是由 Flask 自己生成的
 # 其他状态码都由 Web 服务生成，因此可在api蓝本的 errors.py 模块作为辅助函数实现
@@ -21,7 +21,7 @@ def page_not_found(e):
     if request.accept_mimetypes.accpet_json and not request.accept_mimetypes.accept_html:
         response = jsonify({'error':'地址输入错误'})
         response.status_code = 404
-    return render_template('404.html'), 404
+    return render_template('error/404.html'), 404
 
 
 @main.app_errorhandler(500)
@@ -29,4 +29,4 @@ def internal_server_error(e):
     if request.accept_mimetypes.accpet_json and not request.accept_mimetypes.accept_html:
         response = jsonify({'error':'服务器出错'})
         response.status_code = 500
-    return render_template('500.html'), 500
+    return render_template('error/500.html'), 500

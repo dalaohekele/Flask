@@ -1,14 +1,16 @@
 # coding=utf-8
 
+import sys,os
+
 from flask import render_template,abort,flash,url_for,redirect,request,current_app,make_response
 from flask_login import login_required,current_user
+from werkzeug.utils import secure_filename
+from app.table.models import User,Role,Post,Permission,Comment
+from . import main
 from .forms import EditProfileForm,EditProfileAdminForm,PostForm,CommentForm
 from .. import db
-from . import main
-from ..models import User,Role,Post,Permission,Comment
 from ..decorators import admin_required,permission_required
 
-import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -34,7 +36,7 @@ def index():
         query = Post.query
     pagination = query.order_by(Post.timestamp.desc()).paginate(page,per_page=10,error_out=False)
     posts = pagination.items
-    return render_template('index.html',form=form,posts=posts,show_followed=show_followed,pagination=pagination)
+    return render_template('main/index.html',form=form,posts=posts,show_followed=show_followed,pagination=pagination)
 
 # 用户不存在的路由
 @main.route('/user/<username>')
@@ -44,7 +46,7 @@ def user(username):
     pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
         page,per_page=10,error_out=False)
     posts = pagination.items
-    return render_template('user.html',user=user,posts=posts,pagination=pagination)
+    return render_template('user/user.html',user=user,posts=posts,pagination=pagination)
 
 
 # 资料界面路由
@@ -56,13 +58,25 @@ def edit_profile():
         current_user.name = form.name.data
         current_user.location = form.location.data
         current_user.about_me = form.about_me.data
+        # 新增提交用户头像
+        avatar = request.files['avatar']
+        fname = avatar.filename
+        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
+        ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif']
+        flag = '.' in fname and fname.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+        if not flag:
+            flash('文件类型错误')
+            return redirect(url_for('.user', username=current_user.username))
+        avatar.save('{}{}_{}'.format(UPLOAD_FOLDER, current_user.username, fname))
+        current_user.real_avatar = '/static/avatar/{}_{}'.format(current_user.username, fname)
         db.session.add(current_user)
         flash('资料已更新')
         return redirect(url_for('.user', username=current_user.username))
     form.name.data = current_user.name
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', form=form)
+    form.avatar.data = current_user.real_avatar
+    return render_template('user/edit_profile.html', form=form)
 
 # 管理员资料页面路由
 @main.route('/edit-profile/<int:id>', methods=['GET', 'POST'])
@@ -80,7 +94,7 @@ def edit_profile_admin(id):
         user.location = form.location.data
         user.about_me = form.about_me.data
         db.session.add(user)
-        flash('The profile has been updated.')
+        flash('资料已更新')
         return redirect(url_for('.user', username=user.username))
     form.email.data = user.email
     form.username.data = user.username
@@ -89,7 +103,7 @@ def edit_profile_admin(id):
     form.name.data = user.name
     form.location.data = user.location
     form.about_me.data = user.about_me
-    return render_template('edit_profile.html', form=form, user=user)
+    return render_template('user/edit_profile.html', form=form, user=user)
 
 # 博客详情页
 # 评论路由
@@ -112,7 +126,7 @@ def post(id):
         page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
         error_out=False)
     comments = pagination.items
-    return render_template('post.html', posts=[post], form=form,
+    return render_template('blog/post.html', posts=[post], form=form,
                            comments=comments, pagination=pagination)
 
 # 编辑博客文章的路由
@@ -129,7 +143,7 @@ def edit(id):
         flash('博客已更新')
         return redirect(url_for('.post',id=post.id))
     form.body.data = post.body
-    return render_template('edit_post.html',form=form)
+    return render_template('user/edit_post.html',form=form)
 
 # 关注的路由
 @main.route('/follow/<username>')
@@ -175,7 +189,7 @@ def followers(username):
     pagination = user.followers.paginate(page,per_page=10,error_out=False)
     follows = [{'user':item.follower,'timestamp':item.timestamp}
                for item in pagination.items]
-    return render_template('followers.html',user=user,title="关注我的",
+    return render_template('user/followers.html',user=user,title="关注我的",
                            endpoint='.followers',pagination=pagination,
                            follows=follows)
 
@@ -189,7 +203,7 @@ def followed_by(username):
     pagination = user.followed.paginate(page,per_page=10,error_out=False)
     follows = [{'user':item.followed,'timestamp':item.timestamp}
                for item in pagination.items]
-    return render_template('followers.html',user=user,title="我关注的",
+    return render_template('user/followers.html',user=user,title="我关注的",
                            endpoint='.followed_by',pagination=pagination,
                            follows=follows)
 
@@ -220,7 +234,7 @@ def moderate():
         page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
         error_out=False)
     comments = pagination.items
-    return render_template('moderate.html', comments=comments,
+    return render_template('blog/moderate.html', comments=comments,
                            pagination=pagination, page=page)
 
 

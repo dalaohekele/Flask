@@ -1,7 +1,8 @@
-import unittest
 import time
+import unittest
+
 from app import create_app, db
-from app.models import User
+from app.table.models import User
 
 
 class UserModelTestCase(unittest.TestCase):

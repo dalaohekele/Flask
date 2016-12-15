@@ -1,9 +1,14 @@
+{#文章内容#}
 <ul class="posts">
     {% for post in posts %}
     <li class="post">
         <div class="post-thumbnail">
             <a href="{{ url_for('.user', username=post.author.username) }}">
-                <img class="img-rounded profile-thumbnail" src="../static/12.jpg" height="40" width="40" />
+                {% if post.author.real_avatar %}
+                <img class="img-rounded profile-thumbnail" src="{{ post.author.real_avatar }}">
+                {% else %}
+                <img class="img-rounded profile-thumbnail" src="/static/avatar/default.jpg">
+                {% endif %}
             </a>
         </div>
         <div class="post-content">
