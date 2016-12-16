@@ -10,7 +10,7 @@ from . import main
 from .forms import EditProfileForm,EditProfileAdminForm,PostForm,CommentForm
 from .. import db
 from ..decorators import admin_required,permission_required
-
+from uploader import Uploader
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -75,7 +75,6 @@ def edit_profile():
     form.name.data = current_user.name
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me
-    form.avatar.data = current_user.real_avatar
     return render_template('user/edit_profile.html', form=form)
 
 # 管理员资料页面路由
@@ -133,6 +132,9 @@ def post(id):
 @main.route('/edit/<int:id>',methods=['GET','POST'])
 @login_required
 def edit(id):
+
+
+
     post = Post.query.get_or_404(id)
     if current_user !=post.author and not current_user.can(Permission.ADMINISTER):
         abort(403)
@@ -143,7 +145,7 @@ def edit(id):
         flash('博客已更新')
         return redirect(url_for('.post',id=post.id))
     form.body.data = post.body
-    return render_template('user/edit_post.html',form=form)
+    return render_template('blog/edit_post.html',form=form)
 
 # 关注的路由
 @main.route('/follow/<username>')

@@ -82,7 +82,7 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.Text())
     # 新增用户头像
     real_avatar = db.Column(db.String(128),default=None)
-    avatar_hash = db.Column(db.String(32))
+
 
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)

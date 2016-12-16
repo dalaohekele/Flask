@@ -19,8 +19,7 @@ class Config:
     # 微软 Windows 用户可按照下面的方式设定环境变量：
     # (venv) $ set MAIL_USERNAME=<Gmail username>
     # (venv) $ set MAIL_PASSWORD=<Gmail password>
-    # set MAIL_USERNAME=zhoule627886474@163.com
-    FLASKY_MAIL_SENDER = 'zhoule627886474@163.com'
+    FLASKY_MAIL_SENDER = '942086808@qq.com'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     FLASKY_POSTS_PER_PAGE = 20
     FLASKY_FOLLOWERS_PER_PAGE = 50

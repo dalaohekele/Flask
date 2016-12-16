@@ -1,11 +1,11 @@
-{% extends "mainbase.html" %}
+{% extends "main/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "main/_macros.html" as macros %}
 
-{% block title %}Flasky - Post{% endblock %}
+{% block title %}BIGHappy - 博客{% endblock %}
 
 {% block page_content %}
-{% include '_posts.html' %}
+{% include 'blog/_posts.html' %}
 <h4 id="comments">Comments</h4>
 {% if current_user.can(Permission.COMMENT) %}
 <div class="comment-form">
