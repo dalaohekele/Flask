@@ -7,4 +7,4 @@
 
 **持续更新笔记**
 12月1号至12月14号：跟着书本把代码撸到第二部分的第14章，其中第10.4章没有跟着写，因为我觉得头像太丑了，而且更本访问不了。我直接用一张美女的图片写死在页面，等完成了第14章才去修改。上美女(图片网上找的，应该没事吧）。
- ![image](https://github.com/627886474/Flask/blob/master/app/static/12.jpg）
+![](https://github.com/627886474/Flask/blob/master/app/static/12.jpg）
