@@ -3,7 +3,11 @@
     <li class="comment">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=comment.author.username) }}">
-                 <img class="img-rounded profile-thumbnail" src="../static/12.jpg">
+                {% if user.real_avatar %}
+                <img class="img-rounded profile-thumbnail" src="{{ user.real_avatar }}">
+                {% else %}
+                <img class="img-rounded profile-thumbnail" src="/static/avatar/default.jpg">
+                {% endif %}
             </a>
         </div>
         <div class="comment-content">
@@ -11,7 +15,7 @@
             <div class="comment-author"><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a></div>
             <div class="comment-body">
                 {% if comment.disabled %}
-                <p><i>This comment has been disabled by a moderator.</i></p>
+                <p><i>请在此处填写评论信息</i></p>
                 {% endif %}
                 {% if comment.body_html %}
                     {{ comment.body_html | safe }}

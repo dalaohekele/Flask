@@ -19,12 +19,13 @@ class Config:
     # 微软 Windows 用户可按照下面的方式设定环境变量：
     # (venv) $ set MAIL_USERNAME=<Gmail username>
     # (venv) $ set MAIL_PASSWORD=<Gmail password>
-    # set MAIL_USERNAME=zhoule627886474@163.com
-    FLASKY_MAIL_SENDER = 'zhoule627886474@163.com'
+    FLASKY_MAIL_SENDER = '942086808@qq.com'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     FLASKY_POSTS_PER_PAGE = 20
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
+
+    UPLOAD_FOLDER = os.getcwd() + '/app/static/avatar/'
 
     @staticmethod
     def init_app(app):
@@ -41,7 +42,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/Flask-pro'
 
-
+# default默认设置为开发环境的数据库
+# 如需要切换数据库，则将default的值修改为ProductionConfig
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,

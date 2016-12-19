@@ -1,20 +1,24 @@
-{% extends "base.html" %}
-{% import "_macros.html" as macros %}
+{% extends "main/base.html" %}
+{% import "main/_macros.html" as macros %}
 
-{% block title %}Flasky - {{ title }} {{ user.username }}{% endblock %}
+{% block title %}BIGHappy -{{ title }} {{ user.username }}{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
     <h1>{{ title }} </h1>
 </div>
 <table class="table table-hover followers">
-    <thead><tr><th>User</th><th>Since</th></tr></thead>
+    <thead><tr><th>用户</th><th>最近一次登录</th></tr></thead>
     {% for follow in follows %}
     {% if follow.user != user %}
     <tr>
         <td>
             <a href="{{ url_for('.user', username = follow.user.username) }}">
-{#                <img class="img-rounded" src="{{ follow.user.gravatar(size=32) }}">#}
+                    {% if user.real_avatar %}
+                    <img class="img-rounded profile-thumbnail" src="{{ user.real_avatar }}">
+                    {% else %}
+                    <img class="img-rounded profile-thumbnail" src="/static/avatar/default.jpg">
+                    {% endif %}
                 {{ follow.user.username }}
             </a>
         </td>

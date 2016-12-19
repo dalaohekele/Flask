@@ -1,13 +1,14 @@
 # coding=utf-8
-from flask_wtf import Form
-from wtforms import StringField,TextAreaField,SubmitField,BooleanField,SelectField
-from wtforms.validators import DataRequired,Length,Email,Regexp
-from wtforms import ValidationError
-from ..models import Role, User
-from flask.ext.pagedown.fields import PageDownField
-
-# 添加中文支持
 import sys
+
+from flask.ext.pagedown.fields import PageDownField
+from flask_wtf import Form
+from wtforms import StringField,TextAreaField,SubmitField,BooleanField,SelectField,FileField
+from wtforms import ValidationError
+from wtforms.validators import DataRequired,Length,Email,Regexp
+
+from app.table.models import Role, User
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -20,6 +21,7 @@ class EditProfileForm(Form):
     name = StringField('真实姓名',validators=[Length(0,64)])
     location = StringField('地址',validators=[Length(0,64)])
     about_me = TextAreaField('自我描述')
+    avatar = FileField('头像')
     submit = SubmitField('提交')
 
 
@@ -55,18 +57,18 @@ class EditProfileAdminForm(Form):
     # 所以field.data这句意思实际上是form.email.data != self.user.username 。
     def validate_email(self,field):
         if field.data != self.user.email and User.query.filter_by(email=field.data).first():
-            raise ValidationError('邮箱已存在')
+            raise ValidationError(u'邮箱已存在')
 
 
     def validate_username(self, field):
         if field.data != self.user.username and User.query.filter_by(username=field.data).first():
-            raise ValidationError('用户名已存在')
+            raise ValidationError(u'用户名已存在')
 # 博客表单
 class PostForm(Form):
-    body = PageDownField('内容',validators=[DataRequired()])
-    submit = SubmitField('提交')
+    body = TextAreaField(u'内容',validators=[DataRequired(u'内容不能为空！')])
+    submit = SubmitField(u'提交')
 
 # 评论表单
 class CommentForm(Form):
-    body = StringField('评论',validators=[DataRequired()])
-    sybmit = SubmitField('提交')
+    body = StringField(u'评论',validators=[DataRequired()])
+    sybmit = SubmitField(u'提交')

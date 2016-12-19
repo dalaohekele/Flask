@@ -1,16 +1,17 @@
 # coding=utf-8
+import sys
+
 from flask import render_template,redirect,request,url_for,flash
+from flask.ext.login import current_user
 from flask.ext.login import login_user,logout_user,login_required
+
+from app.table.models import User
 from . import auth
-from .. import db
-from ..models import User
 from .forms import LoginForm,RegistrationForm,ChangePasswordForm,PasswordResetForm,\
     PasswordResetRequestForm,ChangeEmailForm
+from .. import db
 from ..email import send_email
-from flask.ext.login import current_user
 
-# 添加中文支持
-import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 

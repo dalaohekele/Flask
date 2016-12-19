@@ -2,9 +2,12 @@
 # 检查用户权限的自定义修饰器
 
 from functools import wraps
+
 from flask import abort
 from flask_login import current_user
-from .models import Permission
+
+from app.table.models import Permission
+
 
 def permission_required(permission):
     def decorator(f):

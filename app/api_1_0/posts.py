@@ -1,10 +1,12 @@
 # coding=utf-8
-from flask import jsonify, request, g, abort, url_for, current_app
-from .. import db
-from ..models import Post, Permission
+from flask import jsonify, request, g, url_for
+
+from app.table.models import Post, Permission
 from . import api
 from .decorators import permission_required
 from .errors import forbidden
+from .. import db
+
 
 # 分页文章资源
 @api.route('/posts/')

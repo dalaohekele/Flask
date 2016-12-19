@@ -1,0 +1,22 @@
+{% extends "main/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}BIGHappy - 编辑博客{% endblock %}
+{% block head %}
+{{ super() }}
+	<script src="//cdn.ckeditor.com/4.4.6/standard/ckeditor.js"></script>
+{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>编辑博客</h1>
+</div>
+<div>
+    <form method="post" action="">
+        {{ form.csrf_token }}
+        {{ form.body(class="ckeditor") }}
+        <button type="submit" class="btn btn-success">提交</button>
+    </form>
+</div>
+{% endblock %}
+
